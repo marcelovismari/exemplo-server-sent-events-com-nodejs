@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Exemplo SSE - consolelog.com.br</title>
+    <meta charset="UTF-8" />
+  </head>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    input[type='button'] {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+
+    input[type='button']:disabled {
+      background-color: #787878;
+    }
+
+    input[type='text'] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      font-size: 16px;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+  <body>
+    <input
+      autofocus
+      type="text"
+      id="inputUsuario"
+      placeholder="id do usuário (qualquer valor)" />
+    <input
+      type="button"
+      id="btnIniciar"
+      value="Iniciar" />
+    <input
+      type="button"
+      id="btnParar"
+      value="Parar"
+      disabled />
+
+    <table id="mensagens">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Conexão</th>
+          <th>Mensagem</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      let eventSource = null;
+
+      const inputUsuario =
+        document.querySelector('#inputUsuario');
+      const btnIniciar =
+        document.querySelector('#btnIniciar');
+      const btnParar =
+        document.querySelector('#btnParar');
+
+      btnIniciar.addEventListener(
+        'click',
+        iniciarConexaoSSE
+      );
+
+      btnParar.addEventListener(
+        'click',
+        fecharConexaoSSE
+      );
+
+      function iniciarConexaoSSE() {
+        const idUsuario = inputUsuario.value.trim();
+        if (!idUsuario) {
+          alert('Informe um id de usuário qualquer');
+          return;
+        }
+
+        btnIniciar.setAttribute('disabled', '');
+        btnParar.removeAttribute('disabled');
+        inputUsuario.setAttribute('disabled', '');
+
+        const endpoint = `/events?usuario=${idUsuario}`;
+        eventSource = new EventSource(endpoint);
+
+        // Sempre que o servidor envia uma mensagem, o
+        // código abaixo é executado:
+        eventSource.onmessage = (event) => {
+          const { idUsuario, idConexao, mensagem } =
+            JSON.parse(event.data);
+
+          const tr = document.createElement('tr');
+
+          const tdUsuario = document.createElement('td');
+          tdUsuario.textContent = idUsuario;
+          tr.appendChild(tdUsuario);
+
+          const tdConexao = document.createElement('td');
+          tdConexao.textContent = idConexao;
+          tr.appendChild(tdConexao);
+
+          const tdMsg = document.createElement('td');
+          tdMsg.textContent = mensagem;
+          tr.appendChild(tdMsg);
+
+          document
+            .querySelector('#mensagens tbody')
+            .appendChild(tr);
+        };
+      }
+
+      function fecharConexaoSSE() {
+        eventSource.close();
+
+        btnIniciar.removeAttribute('disabled');
+        btnParar.setAttribute('disabled', '');
+        inputUsuario.removeAttribute('disabled');
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "sse",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "format": "npx prettier 'src/**/*.{js,html}' --write"
+  },
+  "keywords": [
+    "express",
+    "sse"
+  ],
+  "private": true,
+  "author": "Marcelo R. Vismari",
+  "license": "ISC",
+  "description": "Projeto didático mostrando um exemplo de uso do Server Sent Event (SSE)",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
